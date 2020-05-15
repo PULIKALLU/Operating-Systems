@@ -1,0 +1,57 @@
+S0=([PTBR+2*(SP/512)]*512)+(SP%512);
+
+S1=[S0-1];
+S2=[S0-4];
+S3=[S0-3];
+
+if(S1==5) then
+ if(S2>7&&S2<0) then
+  [S0-2]=-1;
+  ireturn;
+ else
+  S5=(PTBR-1024)/8;
+  S12=READY_LIST+S5*32+15+S2*2;
+  if([S12]==-1) then
+   [S0-2]=-1;
+   ireturn;
+  endif;
+  
+  S4=[FILE_TABLE+[S12]*2];
+  S4=[FAT+S4+2];
+  load(1,S4);
+  S6=[S12+1];
+  S7=S6/512;
+  if([512+S7]==-1) then
+   S8=0;
+   while(S8<447) do
+    if([DISK_LIST+S8]==0) then
+     break;
+    endif;
+    S8=S8+1;
+   endwhile;
+   [DISK_LIST+S8]=1;
+   [512+S7]=S8;
+   store(1,S4);
+   S4=[FILE_TABLE+[S12]*2];
+   [FAT+S4+1]=512;
+   store(5,19);
+   store(6,20);
+  else
+   S8=[512+S7];
+  endif;
+  
+  load(1,S8);
+  
+  [512+(S6%512)]=S3;
+  store(1,S8);
+  [S12+1]=[S12+1]+1;
+  [S0-2]=0;
+  ireturn;
+ endif;
+endif;
+  
+   
+   
+    
+   
+  

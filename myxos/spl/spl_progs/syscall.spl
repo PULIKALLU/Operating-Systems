@@ -1,0 +1,209 @@
+alias physicalsp S0;
+physicalsp=([PTBR + 2 * (SP / 512)] * 512) + (SP % 512);
+
+alias syscall S1;
+alias args S2;
+syscall=[physicalsp-1];
+args=[physicalsp-3];
+
+if(syscall==1) then
+
+
+ alias count S3;
+ count=0;
+ S9=0;
+breakpoint;
+ while(S9<=63) do
+  if([FAT+count]==args) then 
+   break;
+
+  else
+   S9=S9+1;
+   count=count+8;
+
+  endif;
+ endwhile;
+breakpoint;
+ if(S9<63) then 
+  [physicalsp-2]=0;
+  ireturn;
+ else
+  count=0;
+  while(count<512) do
+   if([DISK_LIST+count]==0) then
+    break;
+   else
+    count=count+1;
+   endif;
+  endwhile;
+breakpoint;
+  if(count==512) then
+   [physicalsp-2]=-1;
+   ireturn;
+  else
+   alias cnt S4;
+   S10=0;
+   cnt=2;
+   while(S10<=63) do
+    if([FAT+cnt]==-1) then
+     break;
+
+    else
+     S10=S10+1;
+     cnt=cnt+8;
+    endif;
+   endwhile;
+   if(S10>63) then
+    [physicalsp-2]=-1;
+    ireturn;
+   else
+    cnt=cnt-2;
+    [FAT+cnt]=args;
+    
+    [FAT+cnt+1]=0;
+    [FAT+cnt+2]=count;
+    load(1,count);
+    S6=0;
+    
+    S8=512;
+    while(S6<512) do
+     [S8+S6]=-1;
+     S6=S6+1;
+    endwhile;
+    store(1,count);
+    [DISK_LIST+count]=1;
+    store(5,19);
+    store(6,20);
+    [physicalsp-2]=0;
+    ireturn;
+   endif;
+  endif;
+ endif;
+endif;
+
+if(syscall==4) then
+ alias count S3;
+ count=0;
+ S9=0;
+ while(S9<=63) do
+  if([FAT+count]==args) then 
+   break;
+
+  else
+   S9=S9+1;
+   count=count+8;
+  endif;
+ endwhile;
+ if(S9>63) then
+  [physicalsp-2]=-1;
+  ireturn;
+ else
+  S4=0;
+  while(S4<128) do
+   if([FILE_TABLE+S4]==S9) then
+    break;
+   else
+    S4=S4+2;
+   endif;
+  endwhile;
+  if(S4<128) then
+   [physicalsp-2]=-1;
+   ireturn;
+  endif;
+  S9=0;
+  count=0;
+  while(S9<=63) do
+   if([FAT+count]==args) then 
+    break;
+
+   else
+    S9=S9+1;
+    count=count+8;
+   endif;
+  endwhile;
+  S4=[FAT+count+2];
+  load(1,S4);
+  S5=0;
+  breakpoint;
+  while(S5<512) do
+   if([512+S5]!=-1) then
+    S10=[512+S5];
+    load(1,S10);
+    S6=0;
+    while(S6<511) do
+     [512+S6]="\0";
+     S6=S6+1;
+    endwhile;
+    breakpoint;
+    
+    store(1,S10);
+    [DISK_LIST+S10]=0;
+    load(1,S4);
+   endif;
+   S5=S5+1;
+  endwhile;
+  breakpoint;
+  load(1,S4);
+  S5=0;
+  breakpoint;
+  while(S5<512) do
+   [512+S5]="";
+   S5=S5+1;
+  endwhile;
+  breakpoint;
+  store(1,S4);
+  [DISK_LIST+S4]=0;
+  count=0;
+  S9=0;
+  while(S9<=63) do
+   if([FAT+count]==args) then 
+    break;
+
+   else
+    S9=S9+1;
+    count=count+8;
+   endif;
+  endwhile;
+  [FAT+count]=-1;
+  [FAT+count+2]=-1;
+  store(5,19);
+  store(6,20);
+  [physicalsp-2]=0;
+  ireturn;
+ endif;
+endif;
+  
+  
+     
+     
+  
+  
+  
+ 
+
+ 
+    
+    
+    
+
+    
+    
+  
+   
+   
+  
+  
+
+ 
+  
+   
+
+  
+   
+
+ 
+
+
+
+
+

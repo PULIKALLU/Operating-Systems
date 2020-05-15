@@ -1,0 +1,110 @@
+S1=EFR%10;
+S2=(EFR/10)%100;
+S3=(EFR/1000);
+
+if(S1!=0) then
+ inline "JMP 11776";
+endif;
+if([PTBR+2*S2]==-1) then
+ inline "JMP 11776";
+endif;
+breakpoint;
+S5=0;
+while(S5<64) do
+ if([MEM_LIST+S5]==0) then
+   [MEM_LIST+S5]=1;
+   break;
+ endif;
+S5=S5+1;
+endwhile;
+
+breakpoint;
+
+if(S5==64) then
+  S10=PTBR+2*S2+1;
+  
+  
+  while(1) do
+    while(S10<=1024+8*31+7) do
+     if((S10+1)%8==0) then
+      
+       S10=S10+2;
+       continue;
+     endif;
+     
+
+     if([S10]=="11") then
+        S5=[S10-1];
+       if([MEM_LIST+S5]==1) then
+       [S10]="01";
+      
+       S10=S10+2;
+       continue;
+       endif;
+       
+       S10=S10+2;
+     endif;
+     
+     if([S10]=="00") then
+       S10=S10+2;
+       
+       continue;
+     endif;
+    
+     if([S10]=="01") then
+       S5=[S10-1];
+       if([MEM_LIST+S5]>1) then
+        
+        S10=S10+2;
+        continue;
+       endif;
+       S7=448;
+       while(S7<=511) do
+         if([DISK_LIST+S7]==0) then
+          break;
+         endif;
+         S7=S7+1;
+       endwhile;
+       if(S7>511) then
+         inline "JMP 11776";
+       endif;
+       [DISK_LIST+S7]=1;
+       store(S5,S7);
+       store(6,20);
+       load(6,20);
+       [S10-1]=S7;
+       [S10]="00";
+       
+       break;
+     endif;
+     
+    endwhile;
+    if(S10<=1024+8*31+7) then
+     break;
+    endif;
+    S10=1025;
+   
+  endwhile;
+endif;
+
+breakpoint;
+S10=[PTBR+2*S2];
+if(S10>447) then
+ load(S5,S10);
+ S9=[DISK_LIST+S10];
+ S9=S9-1;
+ [DISK_LIST+S10]=S9;
+ store(6,20);
+ load(6,20);
+else
+ load(S5,S10);
+endif;
+[PTBR+2*S2]=S5;
+[PTBR+2*S2+1]="11";
+SP=SP+1;
+breakpoint;
+S12=[PTBR+2*(SP/512)]*512 + (SP%512);
+
+[S12]=S3;
+ireturn;
+     

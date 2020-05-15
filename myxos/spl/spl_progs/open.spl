@@ -1,0 +1,117 @@
+S0=([PTBR+2*(SP/512)]*512)+(SP%512);
+
+S1=[S0-1];
+S2=[S0-3];
+
+if(S1==2) then
+ S3=0;
+ 
+ while(S3<=63) do
+  if([FAT+8*S3]==S2) then
+   break;
+  else
+   S3=S3+1;
+  endif;
+ endwhile;
+
+ if(S3>63) then
+  [S0-2]=-1;
+  ireturn;
+ else
+  S4=0;
+  while(S4<128) do
+   if([FILE_TABLE+S4]==S3) then
+    break;
+   else
+    S4=S4+2;
+   endif;
+  endwhile;
+  
+  if(S4==128) then
+   S4=0;
+   while(S4<128) do
+    if([FILE_TABLE+S4]==-1) then
+     break;
+    else
+     S4=S4+2;
+    endif;
+   endwhile;
+   
+   if(S4==128) then
+    [S0-2]=-1;
+    ireturn;
+   endif;
+  endif;
+  [FILE_TABLE+S4]=S3;
+  [FILE_TABLE+S4+1]=[FILE_TABLE+S4+1]+1;
+  S5=(PTBR-1024)/8;
+  S3=0;
+  
+  while(S3<16) do
+   if([READY_LIST+S5*32+15+S3]==-1) then
+    break;
+   else
+    S3=S3+2;
+   endif;
+  endwhile;
+  
+  if(S3==16) then
+  
+   [S0-2]=-1;
+   ireturn;
+  else
+   
+   [READY_LIST+S5*32+15+S3]=S4;
+   [READY_LIST+S5*32+15+S3+1]=0;
+   
+   [S0-2]=S3/2;
+   ireturn;
+  endif;
+ endif;
+
+
+else
+ if(S2>7||S2<0) then
+  [S0-2]=-1;
+  ireturn;
+ else
+  S5=(PTBR-1024)/8;
+  breakpoint;
+  S12=READY_LIST+S5*32+15+S2*2;
+  if([S12]==-1) then
+   [S0-2]=-1;
+   ireturn;
+  else
+   S3=[S12]*2;
+   breakpoint;
+   if([FILE_TABLE+S3+1]==1) then
+    [FILE_TABLE+S3+1]=0;
+    [FILE_TABLE+S3]=-1;
+   else
+    [FILE_TABLE+S3+1]=[FILE_TABLE+S3+1]-1;
+   endif;
+   [S12]=-1;
+   [S12+1]=-1;
+   [S0-2]=0;
+   ireturn;
+  endif;
+ endif;
+endif; 
+ 
+
+   
+  
+  
+   
+   
+  
+  
+  
+  
+
+ 
+
+   
+ 
+ 
+

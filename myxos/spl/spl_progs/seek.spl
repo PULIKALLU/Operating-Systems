@@ -1,0 +1,61 @@
+S0=([PTBR+2*(SP/512)]*512)+(SP%512);
+
+S1=[S0-1];
+S2=[S0-4];
+S3=[S0-3];
+
+if(S1==6) then
+ if(S2>7&&S2<0) then
+  [S0-2]=-1;
+  ireturn;
+ else
+  S5=(PTBR-1024)/8;
+  if([READY_LIST+S5*32+15+S2*2]==-1) then
+   [S0-2]=-1;
+   ireturn;
+  endif;
+  S4=[FILE_TABLE+[READY_LIST+S5*32+15+S2*2]*2];
+  S6=[FAT+S4+1];
+  if(S3>S6||S3<0) then
+   [S0-2]=-1;
+   ireturn;
+  endif;
+  [READY_LIST+S5*32+15+S2*2+1]=S3;
+  [S0-2]=0;
+  ireturn;
+ endif;
+endif;
+
+if(S1==7) then
+
+ if(S2>7&&S2<0) then
+  [S0-2]=-1;
+  ireturn;
+ endif;
+ 
+  S5=(PTBR-1024)/8;
+  if([READY_LIST+S5*32+15+S2*2]==-1) then
+   [S0-2]=-1;
+   ireturn;
+  endif;
+  S4=[FILE_TABLE+[READY_LIST+S5*32+15+S2*2]*2];
+  S4=[FAT+S4+2];
+  load(1,S4);
+  S10=[READY_LIST+S5*32+15+S2*2+1];
+  if(S10>[FAT+S4+1]) then
+   [S0-2]=-1;
+   ireturn;
+  endif;
+  S9=S10/512;
+  S9=[512+S9];
+  load(1,S9);
+  S8=(S10)%512;
+  [S0-3]=[512+S8];
+  [READY_LIST+S5*32+15+S2*2+1]=[READY_LIST+S5*32+15+S2*2+1]+1;
+  [S0-2]=0;
+  ireturn;
+endif;
+  
+   
+  
+

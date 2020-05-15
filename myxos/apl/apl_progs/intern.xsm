@@ -1,0 +1,5 @@
+START
+INT 1
+HALT
+END
+

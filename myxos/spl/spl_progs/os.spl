@@ -1,0 +1,97 @@
+load(23,17);
+load(24,18);
+
+load(7,1);
+load(8,2);
+
+load(9,3);
+load(10,4);
+
+load(11,5);
+load(12,6);
+
+
+
+load(25,21);
+load(26,22);
+load(27,23);
+
+[READY_LIST+0]=0;
+
+PTBR=1024;
+PTLR=4;
+
+[PTBR+0]=25;
+[PTBR+1]="01";
+[PTBR+2]=26;
+[PTBR+3]="01";
+[PTBR+4]=27;
+[PTBR+5]="01";
+[PTBR+6]=28;
+[PTBR+7]="01";
+
+
+[READY_LIST+1]=2;
+SP=3*512;
+BP=3*512;
+
+[28*512]=0;
+
+load(5,19);
+load(6,20);
+
+load(13,7);
+load(14,8);
+
+load(15,9);
+load(16,10);
+
+load(17,11);
+load(18,12);
+
+load(19,13);
+load(20,14);
+
+load(21,15);
+load(22,16);
+
+S1=0;
+while(S1<=28) do
+ [MEM_LIST+S1]=1;
+ S1=S1+1;
+endwhile;
+
+while(S1<=63) do
+ [MEM_LIST+S1]=0;
+ S1=S1+1;
+endwhile;
+ 
+S1=1;
+while(S1<=31) do
+ [READY_LIST+S1*32+1]=0;
+ S1=S1+1;
+endwhile;
+
+
+
+
+
+
+alias count S0;
+
+S0=0;
+while(S0<128) do
+ [FILE_TABLE+S0+0]=-1;
+ [FILE_TABLE+S0+1]=0;
+ S0=S0+2;
+endwhile;
+
+count=15;
+while(count<=30) do
+ [READY_LIST+count]=-1;
+ [READY_LIST+count+1]=-1;
+ count=count+2;
+endwhile;
+ireturn;
+
+

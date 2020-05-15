@@ -1,0 +1,71 @@
+alias newpid S0;
+
+newpid=(PTBR-1024)/8;
+
+alias newpcb S1;
+
+newpcb=1536 + newpid*32;
+
+[newpcb+1]=1;
+
+[newpcb+2]=BP;
+[newpcb+3]=SP-1;
+
+alias physicalsp S2;
+physicalsp=[PTBR+2*(SP/512)]*512 + (SP%512);
+
+[newpcb+4]=[physicalsp];
+
+[newpcb+5]=PTBR;
+
+[newpcb+6]=PTLR;
+[newpcb+7]=R0;
+[newpcb+8]=R1;
+[newpcb+9]=R2;
+[newpcb+10]=R3;
+[newpcb+11]=R4;
+[newpcb+12]=R5;
+[newpcb+13]=R6;
+[newpcb+14]=R7;
+
+alias rahul S3;
+newpid=(PTBR-1024)/8;
+if(newpid==31) then
+ newpid=0;
+else
+ newpid=newpid+1;
+endif;
+while([1537+newpid*32]!=1) do
+ if(newpid==31) then
+  newpid=0;
+ else
+  newpid=newpid+1;
+ endif;
+endwhile;
+rahul=1536+newpid*32;
+[rahul+1]=2;
+BP=[rahul+2];
+SP=[rahul+3];
+
+PTBR=[rahul+5];
+PTLR=[rahul+6];
+R0=[rahul+7];
+R1=[rahul+8];
+R2=[rahul+9];
+R3=[rahul+10];
+R4=[rahul+11];
+R5=[rahul+12];
+R6=[rahul+13];
+R7=[rahul+14];
+
+SP = SP + 1;
+alias newphysicalSP S4;
+newphysicalSP = ([PTBR + 2 * (SP / 512)] * 512) + (SP % 512);
+[ newphysicalSP ] = [ rahul + 4 ];
+
+ireturn;
+
+
+
+
+

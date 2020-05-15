@@ -1,0 +1,118 @@
+S0=([PTBR+2*(SP/512)]*512)+(SP%512);
+
+S1=[S0-3];
+
+
+ S3=0;
+ 
+ while(S3<=63) do
+  if([FAT+8*S3]==S1) then
+   break;
+  else
+   S3=S3+1;
+  endif;
+ endwhile;
+breakpoint;
+ if(S3>63) then
+  [S0-2]=-1;
+  ireturn;
+ endif;
+ S2=[FAT+8*S3+2];
+ load(1,S2);
+ S3=0;
+ S4=0;
+ while(S4<3) do
+  if([512+S4]!=-1) then
+   S3=S3+1;
+  endif;
+S4=S4+1;
+ endwhile;
+breakpoint;
+ S4=1;
+ S5=0;
+ while(S4<=5) do
+   if([PTBR+S4]=="01"||[PTBR+S4]=="11") then
+     S5=S5+1;
+   endif;
+   S4=S4+2;
+ endwhile;
+ breakpoint;
+ if(S5>=S3) then
+  S5=S5-S3;
+  S6=5;
+  while(S5!=0) do
+   if([PTBR+S6]=="01"||[PTBR+S6]=="11") then
+     [PTBR+S6]="00";
+     [PTBR+S6-1]=-1;
+     S5=S5-1;
+   endif;
+   S6=S6-2;
+  endwhile;
+     
+  
+ else
+  S5=S3-S5;
+  S6=1;
+  while(S5!=0) do
+    if([PTBR+S6]=="00") then
+      S5=S5-1;
+      S4=0;
+      while(S4<=63) do
+       if([MEM_LIST+S4]==0) then
+         break;
+       endif;
+       S4=S4+1;
+      endwhile;
+      [MEM_LIST+S4]=1;
+      [PTBR+S6]="01";
+      [PTBR+S6-1]=S4;
+    endif;
+    S6=S6+2;
+   endwhile;
+  endif;
+breakpoint;
+ S4=0;
+ while(S4<3) do
+  if([512+S4]!=-1) then
+   S5=[512+S4];
+   S6=1;
+   while(S6<=5) do
+    if([PTBR+S6]=="01"||[PTBR+S6]=="11") then
+      S7=[PTBR+S6-1];
+      load(S7,S5);
+      break;
+    endif;
+S6=S6+2;
+   endwhile;
+  endif;
+  S4=S4+1;
+ endwhile;
+
+
+S12=(PTBR-1024)/8;
+S6=READY_LIST+S12*32+15;
+S7=0;
+   while(S7<=14) do
+     if([S6+S7]!=-1) then
+       S8=[S6+S7];
+       S9=FILE_TABLE+S8*2+1;
+       [S9]=[S9]-1;
+       if([S9]==0) then
+        [S9-1]=-1;
+       endif;
+       [S6+S7]=-1;
+       [S6+S7+1]=-1;
+     endif;
+    S7=S7+2;
+   endwhile;
+
+breakpoint;
+SP=3*512;
+
+alias newphysicalSP S4;
+newphysicalSP = ([PTBR + 2 * (SP / 512)] * 512) + (SP % 512);
+[ newphysicalSP ] = 0;
+ireturn;
+
+
+

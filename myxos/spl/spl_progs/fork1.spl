@@ -1,0 +1,112 @@
+S0=([PTBR+2*(SP/512)]*512)+(SP%512);
+ S2=0;
+ 
+ while(S2<=31) do
+  if([READY_LIST+S2*32+1]==0) then
+    break;
+  endif;
+  S2=S2+1;
+ endwhile;
+ if(S2>31) then
+  [S0-2]=-1;
+  ireturn;
+ endif;
+ 
+ [READY_LIST+S2*32]=S2;
+ S10=(PTBR-1024)/8;
+ [READY_LIST+S2*32+31]=S10;
+ S4=0;
+ while(S4<=63) do
+  if([MEM_LIST+S4]==0) then
+   break;
+  endif;
+  S4=S4+1;
+ endwhile;
+ 
+ if(S4>63) then
+  [S0-2]=-1;
+  ireturn;
+ endif;
+ 
+ [MEM_LIST+S4]=1;
+ S12=S4;
+ S3=[PTBR+6];
+ S3=S3*512;
+ S4=S4*512;
+ S5=0;
+ 
+ while(S5<512) do
+  [S4+S5]=[S3+S5];
+  S5=S5+1;
+ endwhile;
+ S3=READY_LIST+S2*32;
+ [S3+5]=1024+8*S2;
+ S5=1024+8*S2;
+ 
+ S10=S5;
+ S6=1;
+ 
+ while(S6<=5) do
+  [S5+S6]=[PTBR+S6];
+  [S5+S6-1]=[PTBR+S6-1];
+  
+  if([S5+S6]=="01"||[S5+S6]=="11") then
+   S13=[S5+S6-1];
+   S14=[MEM_LIST+S13];
+   S14=S14+1;
+   [MEM_LIST+S13]=S14;
+  endif;
+  if([S5+S6]=="00"||[S5+S6]=="10"&&([S5+S6-1]>=448)) then
+   S9=[S5+S6-1];
+   S10=[DISK_LIST+S9];
+   S10=S10+1;
+   [DISK_LIST+S9]=S10;
+  endif;
+  S6=S6+2;
+ endwhile;
+ 
+ [S5+6]=S12;
+ [S5+7]=[PTBR+7];
+ store(6,20);
+ load(6,20);
+ [S3+4]=[S0];
+ [S3+3]=SP-1;
+ [S3+2]=BP;
+ [S3+7]=R0;
+ [S3+8]=R1;
+ [S3+9]=R2;
+ [S3+10]=R3;
+ [S3+11]=R4;
+ [S3+12]=R5;
+ [S3+13]=R6;
+ [S3+14]=R7;
+ [S3+6]=4;
+ S6=15;
+ 
+ S7=READY_LIST;
+ while(S6<=30) do
+  [S3+S6]=[S7+S6];
+  if(([S3+S6]!=-1)&&(S6%2!=0)) then
+   S8=[S3+S6];
+   S9=[FILE_TABLE+2*S8+1];
+   S9=S9+1;
+   [FILE_TABLE+2*S8+1]=S9;
+  endif; 
+  S6=S6+1;
+ endwhile;
+ breakpoint;
+ [S3+1]=1;
+ [S0-2]=S2;
+ S14=([1024+(S2*8)+2*((SP-1)/512)]*512)+((SP-1)%512);
+ [S14-1]=-2;
+ 
+ ireturn;
+ 
+ 
+ 
+  
+ 
+ 
+    
+ 
+
